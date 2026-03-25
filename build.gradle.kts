@@ -3,6 +3,7 @@ val h2Version: String by project
 val koinVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
+val ktorVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.3.0"
@@ -41,6 +42,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:${exposedVersion}")
 //    implementation("com.h2database:h2:$h2Version")
     implementation("org.xerial:sqlite-jdbc:3.51.3.0")
+
+    // ошибки
+    implementation("io.ktor:ktor-server-status-pages:${ktorVersion}")
 
     // логгирование
     implementation("ch.qos.logback:logback-classic:$logbackVersion")

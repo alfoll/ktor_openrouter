@@ -1,0 +1,15 @@
+ktor:
+  application:
+    modules:
+      - com.alfoll.ApplicationKt.module
+  deployment:
+    port: 8080
+
+storage:
+  url: ${STOR_URL}
+  driver: ${STOR_DRIVER:org.sqlite.JDBC}
+
+open_router:
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: ${OPENROUTER_URL:https://openrouter.ai/api/v1/chat/completions}
+  model: ${OPENROUTER_MODEL:openrouter/free} # "meta-llama/llama-3.3-70b-instruct:free" - чета провайдер работать не хотел

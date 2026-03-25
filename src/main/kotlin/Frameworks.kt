@@ -3,19 +3,18 @@ package com.alfoll
 import com.alfoll.database.configureDatabases
 import com.alfoll.database.repository.AiRepository
 import com.alfoll.database.repository.AiRepositoryImpl
+import com.alfoll.exception.OpenRouterException
+import com.alfoll.exception.RecordNotFoundException
 import com.alfoll.service.AiService
 import com.alfoll.service.AiServiceImpl
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.request.*
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
-import org.koin.logger.slf4jLogger
 
 fun Application.configureFrameworks() {
 
@@ -26,8 +25,32 @@ fun Application.configureFrameworks() {
             module {
                 single<Database> { database }
                 single<AiRepository> { AiRepositoryImpl(get()) }
-                single<AiService> { AiServiceImpl(get()) }
+                single<AiService> {
+                    AiServiceImpl(
+                        aiRepository = get(),
+                        aiUrl = environment.config.property("open_router.base_url").getString(),
+                        apiKey = environment.config.property("open_router.api_key").getString(),
+                        model = environment.config.property("open_router.model").getString(),)
+                }
             }
         )
+    }
+
+    install(StatusPages) {
+        exception<IllegalArgumentException> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, cause.message ?: "Bad request 400")
+        }
+        exception<OpenRouterException> { call, cause ->
+            call.respond(HttpStatusCode.BadGateway, cause.message ?: "Open router error 502")
+        }
+        exception<RecordNotFoundException> { call, cause ->
+            call.respond(HttpStatusCode.NotFound, cause.message ?: "Record not found 404")
+        }
+        exception<BadRequestException> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, cause.message ?: "Invalid request body 404")
+        }
+        exception<Throwable> { call, cause ->
+            call.respond(status = HttpStatusCode.InternalServerError, cause.message ?: "Internal Server Error")
+        }
     }
 }
