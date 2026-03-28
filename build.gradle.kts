@@ -22,6 +22,10 @@ kotlin {
     jvmToolchain(21)
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     // DI
     implementation("io.insert-koin:koin-ktor:$koinVersion")
@@ -40,7 +44,6 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:${exposedVersion}")
-//    implementation("com.h2database:h2:$h2Version")
     implementation("org.xerial:sqlite-jdbc:3.51.3.0")
 
     // ошибки
@@ -49,6 +52,10 @@ dependencies {
     // логгирование
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
+    // тесты
+    testImplementation(kotlin("test")) // сама написала
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("io.mockk:mockk:1.13.8")
+
     testImplementation("io.ktor:ktor-server-test-host")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 }
